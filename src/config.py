@@ -1,6 +1,7 @@
 
 from pydantic_settings import BaseSettings
-from typing import List
+from typing import List, Literal
+import os
 
 class Settings(BaseSettings):
     # Application settings
@@ -16,6 +17,10 @@ class Settings(BaseSettings):
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 15
     REFRESH_TOKEN_EXPIRE_DAYS: int = 30
     ALGORITHM: str = "HS256"
+    
+    # Storage settings
+    STORAGE_MODE: Literal["s3", "local"] = "s3"
+    LOCAL_STORAGE_PATH: str = "./local_storage"
     
     # AWS S3 settings
     AWS_ACCESS_KEY_ID: str = "YOUR_AWS_ACCESS_KEY"

@@ -2,8 +2,17 @@
 version: '3.8'
 
 services:
+  client:
+    build:
+      context: ./client
+    ports:
+      - "80:80"
+    depends_on:
+      - api
+
   api:
-    build: .
+    build:
+      context: ./server
     ports:
       - "8000:8000"
     environment:
@@ -12,20 +21,24 @@ services:
       - AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID}
       - AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY}
       - REDIS_HOST=redis
+      - STORAGE_MODE=${STORAGE_MODE:-s3}
     volumes:
-      - .:/app
+      - ./server:/app
+      - local_storage:/app/local_storage
     depends_on:
       - mongodb
       - redis
     command: uvicorn src.main:app --host 0.0.0.0 --port 8000 --reload
     
   celery_worker:
-    build: .
+    build:
+      context: ./server
     environment:
       - MONGODB_URL=mongodb://mongodb:27017
       - REDIS_HOST=redis
       - AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID}
       - AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY}
+      - STORAGE_MODE=${STORAGE_MODE:-s3}
     depends_on:
       - api
       - redis
@@ -48,3 +61,4 @@ services:
 volumes:
   mongodb_data:
   redis_data:
+  local_storage:

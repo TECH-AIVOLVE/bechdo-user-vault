@@ -1,7 +1,14 @@
 
 # BECHDO - Marketplace Backend API
 
-BECHDO is a powerful marketplace platform backend built with FastAPI and MongoDB, focusing on security, scalability, and performance.
+BECHDO is a powerful marketplace platform built with FastAPI and MongoDB, focusing on security, scalability, and performance.
+
+## Project Structure
+
+The project is organized into two main directories:
+
+- `client/`: Frontend application (React)
+- `server/`: Backend API (FastAPI)
 
 ## Features
 
@@ -11,6 +18,11 @@ BECHDO is a powerful marketplace platform backend built with FastAPI and MongoDB
   - Password reset functionality
   - Role-based access control (basic_user, seller, admin, moderator)
   - User profile management
+
+- **Storage Options**
+  - AWS S3 for production
+  - Local file storage for development
+  - Configurable via environment variables
 
 - **Security Features**
   - Argon2 password hashing
@@ -24,9 +36,10 @@ BECHDO is a powerful marketplace platform backend built with FastAPI and MongoDB
 - **Framework**: FastAPI (async REST API)
 - **Database**: MongoDB with Motor async driver
 - **Queue System**: Celery with Redis broker
-- **Media Storage**: AWS S3
+- **Media Storage**: AWS S3 or Local Storage
 - **Authentication**: JWT
 - **Testing**: Pytest
+- **Frontend**: React (client folder)
 
 ## Getting Started
 
@@ -35,7 +48,7 @@ BECHDO is a powerful marketplace platform backend built with FastAPI and MongoDB
 - Python 3.11+
 - MongoDB
 - Redis
-- AWS S3 account (for media storage)
+- (Optional) AWS S3 account for production media storage
 
 ### Setup with Docker
 
@@ -46,11 +59,10 @@ BECHDO is a powerful marketplace platform backend built with FastAPI and MongoDB
    ```
 
 2. **Set environment variables**:
-   Create a `.env` file with the following variables:
-   ```
-   JWT_SECRET=your_secure_jwt_secret
-   AWS_ACCESS_KEY_ID=your_aws_access_key
-   AWS_SECRET_ACCESS_KEY=your_aws_secret_key
+   Copy the example env file and update values:
+   ```bash
+   cp .env.example .env
+   # Edit .env with your settings
    ```
 
 3. **Run with docker-compose**:
@@ -58,12 +70,18 @@ BECHDO is a powerful marketplace platform backend built with FastAPI and MongoDB
    docker-compose up
    ```
 
+4. **Access the application**:
+   - Frontend: http://localhost:80
+   - Backend API: http://localhost:8000
+   - API Documentation: http://localhost:8000/api/docs
+
 ### Setup without Docker
 
-1. **Clone the repository**:
+#### Backend Setup
+
+1. **Navigate to server directory**:
    ```bash
-   git clone https://github.com/yourusername/bechdo.git
-   cd bechdo
+   cd server
    ```
 
 2. **Create and activate virtual environment**:
@@ -93,16 +111,50 @@ BECHDO is a powerful marketplace platform backend built with FastAPI and MongoDB
    celery -A src.celery_config worker --loglevel=info
    ```
 
+#### Frontend Setup
+
+1. **Navigate to client directory**:
+   ```bash
+   cd client
+   ```
+
+2. **Install dependencies**:
+   ```bash
+   npm install
+   ```
+
+3. **Run development server**:
+   ```bash
+   npm run dev
+   ```
+
 ## API Documentation
 
 Once the server is running, access the OpenAPI documentation:
 
-- Swagger UI: http://localhost:8000/docs
-- ReDoc: http://localhost:8000/redoc
+- Swagger UI: http://localhost:8000/api/docs
+- ReDoc: http://localhost:8000/api/redoc
+
+## Storage Configuration
+
+BECHDO supports two storage modes:
+
+1. **AWS S3 (default in production)**
+   - Set `STORAGE_MODE=s3` in your .env file
+   - Configure AWS credentials:
+     - `AWS_ACCESS_KEY_ID`
+     - `AWS_SECRET_ACCESS_KEY`
+     - `S3_BUCKET_NAME`
+
+2. **Local Storage (for development)**
+   - Set `STORAGE_MODE=local` in your .env file
+   - Files will be saved to `LOCAL_STORAGE_PATH` (default: ./local_storage)
+   - Access files via API endpoints
 
 ## Running Tests
 
 ```bash
+cd server
 pytest
 ```
 
@@ -124,6 +176,11 @@ pytest
 - `PATCH /api/v1/users/me` - Update current user profile
 - `GET /api/v1/users/profile/{user_id}` - Get public user profile
 - `GET /api/v1/users/avatar-upload-url` - Get presigned URL for avatar upload
+
+### Storage
+
+- `POST /api/v1/storage/local-upload/{file_path}` - Upload file to local storage (dev mode)
+- `GET /api/v1/storage/files/{file_path}` - Get file from local storage (dev mode)
 
 ### Admin Endpoints
 
