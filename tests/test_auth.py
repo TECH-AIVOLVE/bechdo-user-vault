@@ -2,6 +2,7 @@
 import pytest
 from fastapi.testclient import TestClient
 from src.main import app
+from src.core.security import create_email_verification_token
 
 client = TestClient(app)
 
@@ -48,10 +49,37 @@ def test_login_invalid_credentials(test_user):
     )
     assert response.status_code == 401
 
-def test_verify_email():
+def test_verify_email(test_db):
     """Test email verification"""
-    # We would normally test this with a mocked token verification function
-    # Since token verification depends on the JWT secret, we'll just test the endpoint behavior
+    # Create an unverified user
+    test_email = "unverified@example.com"
+    test_user = {
+        "email": test_email,
+        "username": "unverified_user",
+        "hashed_password": "hashed_password",  # Not needed for this test
+        "full_name": "Unverified User",
+        "role": "basic_user",
+        "is_active": False,
+        "is_verified": False
+    }
+    # Insert user directly into test database
+    test_db.users.insert_one(test_user)
+    
+    # Generate a valid verification token
+    valid_token = create_email_verification_token(test_email)
+    
+    # Test with valid token
+    response = client.post(
+        "/api/v1/auth/verify-email",
+        params={"token": valid_token}
+    )
+    assert response.status_code == 200
+    assert "message" in response.json()
+    
+    # Verify user status has been updated
+    verified_user = test_db.users.find_one({"email": test_email})
+    assert verified_user["is_verified"] == True
+    assert verified_user["is_active"] == True
     
     # Invalid token case
     response = client.post(

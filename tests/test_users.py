@@ -1,6 +1,7 @@
 
 import pytest
 from fastapi.testclient import TestClient
+from bson import ObjectId
 from src.main import app
 
 client = TestClient(app)
@@ -64,11 +65,24 @@ def test_admin_update_user(test_admin, test_user):
     assert data["role"] == "seller"
     assert data["is_active"] == True
     
-def test_non_admin_update_user(test_user):
+def test_non_admin_update_user(test_user, test_db):
     """Test non-admin trying to update another user"""
+    # Create another user for testing
+    another_user_data = {
+        "username": "anotheruser",
+        "email": "another@example.com",
+        "full_name": "Another User",
+        "hashed_password": "hashed_password",
+        "is_active": True,
+        "is_verified": True,
+        "role": "basic_user"
+    }
+    result = test_db.users.insert_one(another_user_data)
+    another_user_id = str(result.inserted_id)
+    
     headers = {"Authorization": f"Bearer {test_user['access_token']}"}
     response = client.patch(
-        f"/api/v1/users/{test_user['id']}",
+        f"/api/v1/users/{another_user_id}",
         headers=headers,
         json={"role": "admin"}
     )

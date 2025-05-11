@@ -18,6 +18,7 @@ app = FastAPI(
     version="0.1.0",
     docs_url="/api/docs",  # Swagger UI
     redoc_url="/api/redoc",  # ReDoc UI
+    openapi_url="/api/openapi.json",  # OpenAPI schema
 )
 
 # CORS configuration
