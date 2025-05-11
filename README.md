@@ -50,6 +50,32 @@ The project is organized into two main directories:
 - Redis
 - (Optional) AWS S3 account for production media storage
 
+### Running Order
+
+**Important**: Follow this sequence to start the application:
+
+1. **Start MongoDB**:
+   ```bash
+   docker run --name mongodb -p 27017:27017 -d mongo
+   ```
+
+2. **Start Redis**:
+   ```bash
+   docker run --name redis -p 6379:6379 -d redis
+   ```
+
+3. **Start Celery worker with solo pool**:
+   ```bash
+   cd server
+   celery -A src.celery_config worker --loglevel=info --pool=solo
+   ```
+
+4. **Start FastAPI server**:
+   ```bash
+   cd server
+   uvicorn src.main:app --reload
+   ```
+
 ### Setup with Docker
 
 1. **Clone the repository**:
@@ -108,7 +134,7 @@ The project is organized into two main directories:
 
 7. **Run Celery worker**:
    ```bash
-   celery -A src.celery_config worker --loglevel=info
+   celery -A src.celery_config worker --loglevel=info --pool=solo
    ```
 
 #### Frontend Setup

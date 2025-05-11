@@ -42,7 +42,7 @@ services:
     depends_on:
       - api
       - redis
-    command: celery -A src.celery_config worker --loglevel=info
+    command: celery -A src.celery_config worker --loglevel=info --pool=solo
     
   mongodb:
     image: mongo:latest
