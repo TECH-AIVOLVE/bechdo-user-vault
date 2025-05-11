@@ -45,7 +45,7 @@ class Settings(BaseSettings):
     RATE_LIMIT_PERIOD_SECONDS: int = 60
     
     # CORS
-    CORS_ORIGINS: List[str] = ["http://localhost:3000", "http://localhost:8080"]
+    CORS_ORIGINS: List[str] = ["*"]
     
     class Config:
         env_file = ".env"
